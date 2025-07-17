@@ -1,0 +1,22 @@
+name: Deploying to dev server
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on: 
+  push: 
+    branches: 
+      - "main"
+
+jobs:
+  redeploy_everything:
+    name: Deploying all the apps to staging
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH into server
+        run: |
+          echo {{ secrets.SSH_PRIVATE_KEY }} &> ~/ssh_key
+          ssh -i ~/ssh_key ubuntu@ec2-13-233-161-17.ap-south-1.compute.amazonaws.com
+          cd deploy-turborepo-devops/ && git pull 
+          pnpm install 
+          pnpm run build
+          pm2 restart fe-server
+          pm2 restart http-server
+          pm2 restart ws-server
