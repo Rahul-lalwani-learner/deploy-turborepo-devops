@@ -10,13 +10,20 @@ jobs:
     name: Deploying all the apps to staging
     runs-on: ubuntu-latest
     steps:
-      - name: SSH into server
-        run: |
-          echo {{ secrets.SSH_PRIVATE_KEY }} &> ~/ssh_key
-          ssh -i ~/ssh_key ubuntu@ec2-13-233-161-17.ap-south-1.compute.amazonaws.com
-          cd deploy-turborepo-devops/ && git pull 
-          pnpm install 
-          pnpm run build
-          pm2 restart fe-server
-          pm2 restart http-server
-          pm2 restart ws-server
+      - name: Checkout the code 
+        uses: actions/checkout@v2 
+
+      - name: executing remote ssh commands 
+        uses: appleboy/ssh-action@v1.2.0
+        with: 
+          host: ec2-13-233-161-17.ap-south-1.compute.amazonaws.com
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: | 
+            cd deploy-turborepo-devops/ && git pull 
+            pnpm install 
+            pnpm run build
+            pm2 restart fe-server
+            pm2 restart http-server
+            pm2 restart ws-server
