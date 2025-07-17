@@ -21,8 +21,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: | 
+            npm install -g pnpm pm2
             cd deploy-turborepo-devops/ && git pull origin production
-            sudo npm install -g pnpm pm2
             pnpm install 
             pnpm run build
             pm2 restart fe-server
