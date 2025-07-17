@@ -1,5 +1,5 @@
 name: Deploying to dev server
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+run-name: ${{ github.actor }} Deploying the changes to the dev server 🚀
 on: 
   push: 
     branches: 
@@ -21,7 +21,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: | 
-            cd deploy-turborepo-devops/ && git pull 
+            cd deploy-turborepo-devops/ && git pull origin main
             pnpm install 
             pnpm run build
             pm2 restart fe-server

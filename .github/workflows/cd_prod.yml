@@ -1,0 +1,29 @@
+name: Deploying to production server
+run-name: ${{ github.actor }} Deploying the changes to the production server 🚀
+on: 
+  push: 
+    branches: 
+      - "production"
+
+jobs:
+  redeploy_everything:
+    name: Deploying all the apps to staging
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code 
+        uses: actions/checkout@v2 
+
+      - name: executing remote ssh commands 
+        uses: appleboy/ssh-action@v1.2.0
+        with: 
+          host: ec2-13-201-10-221.ap-south-1.compute.amazonaws.com
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: | 
+            cd deploy-turborepo-devops/ && git pull origin production
+            pnpm install 
+            pnpm run build
+            pm2 restart fe-server
+            pm2 restart http-server
+            pm2 restart ws-server
