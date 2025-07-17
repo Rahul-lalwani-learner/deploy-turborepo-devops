@@ -7,7 +7,7 @@ on:
 
 jobs:
   redeploy_everything:
-    name: Deploying all the apps to staging
+    name: Deploying all the apps to production
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code 
@@ -21,6 +21,27 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: | 
+            # Load NVM if it exists
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+            
+            # Check if Node.js is installed
+            if ! command -v node &> /dev/null; then
+              echo "Node.js not found. Installing Node.js with NVM..."
+              nvm install 18
+              nvm use 18
+              nvm alias default 18
+            fi
+            
+            # Verify Node.js installation
+            node --version
+            npm --version
+            
+            # Install global packages
+            npm install -g pnpm pm2
+            
+            # Deploy the application
             cd deploy-turborepo-devops/ && git pull origin production
             pnpm install 
             pnpm run build
