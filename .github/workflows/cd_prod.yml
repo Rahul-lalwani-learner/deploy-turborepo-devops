@@ -21,7 +21,13 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: | 
-            npm install -g pnpm pm2
+            # Source environment and try multiple common node paths
+            source ~/.bashrc || source ~/.bash_profile || true
+            export PATH="/usr/bin:/usr/local/bin:$PATH"
+            
+            # Use full paths or try to find node
+            /usr/bin/npm install -g pnpm pm2 || npm install -g pnpm pm2
+            
             cd deploy-turborepo-devops/ && git pull origin production
             pnpm install 
             pnpm run build
